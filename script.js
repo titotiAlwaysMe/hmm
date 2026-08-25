@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroPhotoSparkles();
 });
 
+/* ---------- MOBILE DETECTION ---------- */
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
 /* ---------- CELESTIAL PALETTES ---------- */
 const GLOW_COLORS = [
   'rgba(240, 194, 127, 0.9)', // Warm celestial gold
@@ -31,39 +34,42 @@ function initStars() {
   const closingContainer = document.getElementById('closing-stars-container');
   const dustContainer = document.getElementById('celestial-dust-container');
 
+  // Reduce counts on mobile for performance
+  const m = isMobile ? 0.4 : 1;
+
   // Dense, thickened stars for Opening Screen
   if (openingContainer) {
     generateRichStars(openingContainer, {
-      dots: 220,
-      sparkles: 30,
-      halos: 15,
-      dust: 40
+      dots:     Math.floor(220 * m),
+      sparkles: Math.floor(30  * m),
+      halos:    Math.floor(15  * m),
+      dust:     Math.floor(40  * m)
     });
   }
 
   // Persistent Everywhere Stars covering the entire website
   if (globalContainer) {
     generateRichStars(globalContainer, {
-      dots: 280,
-      sparkles: 35,
-      halos: 18,
-      dust: 50
+      dots:     Math.floor(280 * m),
+      sparkles: Math.floor(35  * m),
+      halos:    Math.floor(18  * m),
+      dust:     Math.floor(50  * m)
     });
   }
 
   // Dense, thickened stars for Closing Section
   if (closingContainer) {
     generateRichStars(closingContainer, {
-      dots: 160,
-      sparkles: 25,
-      halos: 12,
-      dust: 35
+      dots:     Math.floor(160 * m),
+      sparkles: Math.floor(25  * m),
+      halos:    Math.floor(12  * m),
+      dust:     Math.floor(35  * m)
     });
   }
 
   // Global floating celestial dust
   if (dustContainer) {
-    generateCelestialDust(dustContainer, 40);
+    generateCelestialDust(dustContainer, Math.floor(40 * m));
   }
 }
 
@@ -318,7 +324,7 @@ function createConfetti() {
   ];
 
   const shapes = ['rect', 'circle'];
-  const count = 120;
+  const count = isMobile ? 50 : 120;
 
   for (let i = 0; i < count; i++) {
     const piece = document.createElement('div');
@@ -482,23 +488,29 @@ function initShootingStars() {
   const globalContainer = document.getElementById('global-shooting-stars');
   const closingContainer = document.getElementById('closing-shooting-stars');
 
+  // On mobile, spawn less frequently
+  const globalInterval  = isMobile ? 7000  : 3800;
+  const closingInterval = isMobile ? 5000  : 2000;
+
   // Global periodic shooting star across any current section
   if (globalContainer) {
     setInterval(() => {
       spawnShootingStar(globalContainer, { minTail: 120, maxTail: 200 });
-    }, 3800);
+    }, globalInterval);
 
     setTimeout(() => spawnShootingStar(globalContainer, { minTail: 140, maxTail: 220 }), 1500);
   }
 
-  // Closing section intense shooting stars
+  // Closing section shooting stars
   if (closingContainer) {
     setInterval(() => {
       spawnShootingStar(closingContainer, { minTail: 160, maxTail: 260 });
-    }, 2000);
+    }, closingInterval);
 
-    setTimeout(() => spawnShootingStar(closingContainer, { minTail: 180, maxTail: 280 }), 500);
-    setTimeout(() => spawnShootingStar(closingContainer, { minTail: 150, maxTail: 240 }), 1200);
+    if (!isMobile) {
+      setTimeout(() => spawnShootingStar(closingContainer, { minTail: 180, maxTail: 280 }), 500);
+      setTimeout(() => spawnShootingStar(closingContainer, { minTail: 150, maxTail: 240 }), 1200);
+    }
   }
 }
 
@@ -536,7 +548,7 @@ function initFloatingOrbs() {
   const container = document.getElementById('floating-orbs-container');
   if (!container) return;
 
-  const count = 18;
+  const count = isMobile ? 7 : 18;
   for (let i = 0; i < count; i++) {
     const orb = document.createElement('div');
     orb.className = 'celestial-orb';
@@ -567,7 +579,8 @@ function initHeroParticles() {
   const container = document.querySelector('.hero-bg-particles');
   if (!container) return;
 
-  for (let i = 0; i < 35; i++) {
+  const heroParticleCount = isMobile ? 12 : 35;
+  for (let i = 0; i < heroParticleCount; i++) {
     const particle = document.createElement('div');
     particle.classList.add('bg-particle');
 
@@ -599,7 +612,7 @@ function initHeroPhotoSparkles() {
   const container = document.getElementById('hero-sparkles-container');
   if (!container) return;
 
-  const count = 16;
+  const count = isMobile ? 8 : 16;
   const radius = 135; // px distance from center of photo ring
 
   for (let i = 0; i < count; i++) {
